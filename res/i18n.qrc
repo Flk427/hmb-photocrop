@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/i18n">
+        <file alias="hmb-photocrop_ru.qm">../i18n/hmb-photocrop_ru.qm</file>
+    </qresource>
+</RCC>
