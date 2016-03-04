@@ -10,10 +10,12 @@ class ImagesList : public QObject
 public:
 	explicit ImagesList(QObject *parent = 0);
 
-	void setImagesDir(const QString& imagesDir);
 	void first();
 	QString getImageFileName();
 	int count();
+
+	QString getImagesDir() const;
+	void setImagesDir(const QString& imagesDir);
 
 signals:
 	void selected(QString fileName, bool isFirst, bool isLast);

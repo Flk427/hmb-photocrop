@@ -49,6 +49,10 @@ void ImagesList::next()
 	qDebug() << "ImagesList next";
 	selectImage(m_imageIndex + 1);
 }
+QString ImagesList::getImagesDir() const
+{
+	return m_imagesDir;
+}
 
 void ImagesList::selectImage(int imageIndex)
 {

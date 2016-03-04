@@ -4,6 +4,7 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QSettings>
 #include "ImagePreview.h"
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -148,6 +149,9 @@ void MainWindow::setEditControlsEnable(bool enabled)
 	ui->actionMirrorV->setEnabled(enabled);
 	ui->actionRotL->setEnabled(enabled);
 	ui->actionRotR->setEnabled(enabled);
+
+	ui->actionPreviousFile->setEnabled(enabled);
+	ui->actionNextFile->setEnabled(enabled);
 }
 
 void MainWindow::applyParams()
@@ -157,9 +161,17 @@ void MainWindow::applyParams()
 		m_imageContainer.loadImage(m_params.sourceImage);
 	}
 
-	// TODO: брать из настроек
-	m_saveDir = QApplication::applicationDirPath();
-	m_filesDir = QApplication::applicationDirPath();
+	readSettings();
+
+	if (m_saveDir.isEmpty())
+	{
+		m_saveDir = QApplication::applicationDirPath();
+	}
+
+	if (m_imagesList->getImagesDir().isEmpty())
+	{
+		m_imagesList->setImagesDir(QApplication::applicationDirPath());
+	}
 }
 
 void MainWindow::shrinkGraphicScene()
@@ -303,6 +315,16 @@ void MainWindow::changeImage(QString fileName, bool isFirst, bool isLast)
 	ui->actionNextFile->setEnabled(!isLast);
 }
 
+void MainWindow::readSettings()
+{
+	QSettings settings("ru.Glider", "HomeMediaBank");
+	restoreGeometry(settings.value("photocrop/geometry").toByteArray());
+	restoreState(settings.value("photocrop/windowState").toByteArray());
+
+	m_imagesList->setImagesDir(settings.value("photocrop/src").toString());
+	m_saveDir = settings.value("photocrop/dst").toString();
+}
+
 void MainWindow::setupUiConnections()
 {
 	connect(ui->actionFit, &QAction::triggered, this, &MainWindow::fit);
@@ -331,4 +353,18 @@ void MainWindow::setupUiConnections()
 	connect(m_ribbonOrientationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectorAspectParamsChanged()));
 
 	connect(m_imagesList, &ImagesList::selected, this, &MainWindow::changeImage);
+	connect(ui->labelPreview, &ImagePreview::resized, this, &MainWindow::onCropSelectorMoved);
+}
+
+
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+	QSettings settings("ru.Glider", "HomeMediaBank");
+	settings.setValue("photocrop/geometry", saveGeometry());
+	settings.setValue("photocrop/windowState", saveState());
+
+	settings.setValue("photocrop/src", m_imagesList->getImagesDir());
+	settings.setValue("photocrop/dst", m_saveDir);
+
+	QMainWindow::closeEvent(event);
 }

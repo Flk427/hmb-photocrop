@@ -60,9 +60,9 @@ private:
 	QLabel* m_selectionSizeInfo;
 	QLabel* m_fileInfo;
 
-	QString m_filesDir;
 	int m_imageIndex;
 
+	void readSettings();
 	void setupUiConnections();
 	void setupLanguage();
 	//! Adds aspect ratio selector and orientation selector to the toolbar.
@@ -73,6 +73,10 @@ private:
 	void applyParams();
 	void updateFileInfo(const QString& name, int pos, int count);
 	void createAspectSelector();
+
+	// QWidget interface
+protected:
+	virtual void closeEvent(QCloseEvent*event);
 };
 
 #endif // MAINWINDOW_H
