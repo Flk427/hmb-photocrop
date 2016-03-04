@@ -77,6 +77,7 @@ void ImageContainer::mirrorHorisontal()
 	m_imageChanged = true;
 	emit imageChanged();
 }
+
 bool ImageContainer::isImageChanged() const
 {
 	return m_imageChanged;

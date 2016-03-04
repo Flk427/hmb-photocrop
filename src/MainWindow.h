@@ -40,7 +40,7 @@ public slots:
 	void onOpenFilesPressed();
 	void onPrevFilePressed();
 	void onNextFilePressed();
-	void onSelectorAspectParamsChanged(int index);
+	void onSelectorAspectParamsChanged();
 	void onCropSelectorMoved();
 
 private:
@@ -61,19 +61,22 @@ private:
 	QLabel* m_fileInfo;
 
 	QString m_filesDir;
-	int m_fileIndex;
+	int m_imageIndex;
 	QStringList m_files;
 
+	void setupUiConnections();
 	void setupLanguage();
+	//! Adds aspect ratio selector and orientation selector to the toolbar.
 	void setupToolBar();
 	void setupGraphicScene();
 	void setupStatusBar();
 	void setEditControlsEnable(bool enabled);
+	void applyParams();
 
-	bool loadFile(int index);
-	void setFileIndex(int fileIndex);
+	//! Change image
+	void changeImage(int imageIndex);
 	void updateFileInfo(const QString& name, int pos, int count);
-	void fillAspects();
+	void createAspectSelector();
 };
 
 #endif // MAINWINDOW_H

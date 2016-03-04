@@ -39,7 +39,6 @@ public slots:
 private:
 	QImage m_originalImage;
 	bool m_imageChanged;
-
 };
 
 #endif // IMAGECONTAINER_H

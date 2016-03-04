@@ -2,7 +2,12 @@
 
 AspectInfo::AspectInfo()
 {
-
+	// TODO: Брать из конфига.
+	append(1, 1);
+	append(4, 3);
+	append(5, 4);
+	append(16, 9);
+	append(16, 10);
 }
 
 void AspectInfo::append(int w, int h)
