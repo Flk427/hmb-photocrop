@@ -77,7 +77,7 @@ void MainWindow::setupLanguage()
 {
 	QTranslator translator;
 
-	if (m_params.language == "ru")
+	if (m_language == "ru")
 	{
 		translator.load(":/i18n/hmb-photocrop_ru.qm");
 	}
@@ -141,6 +141,8 @@ void MainWindow::setEditControlsEnable(bool enabled)
 	if (!enabled)
 	{
 		ui->actionRestoreImage->setEnabled(enabled);
+		ui->actionPreviousFile->setEnabled(enabled);
+		ui->actionNextFile->setEnabled(enabled);
 	}
 
 	ui->actionSaveFile->setEnabled(enabled);
@@ -149,9 +151,6 @@ void MainWindow::setEditControlsEnable(bool enabled)
 	ui->actionMirrorV->setEnabled(enabled);
 	ui->actionRotL->setEnabled(enabled);
 	ui->actionRotR->setEnabled(enabled);
-
-	ui->actionPreviousFile->setEnabled(enabled);
-	ui->actionNextFile->setEnabled(enabled);
 }
 
 void MainWindow::applyParams()
@@ -194,14 +193,20 @@ void MainWindow::onImageChanged()
 
 void MainWindow::onCreate()
 {
+	if (!m_params.sourceImage.isEmpty() && !m_params.destinationImage.isEmpty())
+	{
+		// Running with command line params.
+		ui->mainToolBar->setEnabled(false);
+	}
+
 	setEditControlsEnable(false);
 
-	setupLanguage();
 	setupToolBar();
 	setupGraphicScene();
 	setupStatusBar();
 	setupUiConnections();
 	applyParams();
+	setupLanguage();
 }
 
 void MainWindow::onCropAction()
@@ -218,7 +223,17 @@ void MainWindow::onCropAction()
 
 void MainWindow::onSavePressed()
 {
-	QString fileName = m_saveDir + QDir::separator() + QFileInfo(m_imagesList->getImageFileName()).fileName();
+	QString fileName;
+
+	if (m_params.destinationImage.isEmpty())
+	{
+		fileName = m_saveDir + QDir::separator() + QFileInfo(m_imagesList->getImageFileName()).fileName();
+	}
+	else
+	{
+		fileName = m_params.destinationImage;
+	}
+
 	QFile file(fileName);
 
 	if (file.exists())
@@ -319,10 +334,19 @@ void MainWindow::readSettings()
 {
 	QSettings settings("ru.Glider", "HomeMediaBank");
 	restoreGeometry(settings.value("photocrop/geometry").toByteArray());
-	restoreState(settings.value("photocrop/windowState").toByteArray());
+	// restoreState(settings.value("photocrop/windowState").toByteArray());
 
 	m_imagesList->setImagesDir(settings.value("photocrop/src").toString());
 	m_saveDir = settings.value("photocrop/dst").toString();
+
+	if (m_params.language.isEmpty())
+	{
+		m_language = settings.value("photocrop/lang").toString();
+	}
+	else
+	{
+		m_language = m_params.language;
+	}
 }
 
 void MainWindow::setupUiConnections()
@@ -361,10 +385,11 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
 	QSettings settings("ru.Glider", "HomeMediaBank");
 	settings.setValue("photocrop/geometry", saveGeometry());
-	settings.setValue("photocrop/windowState", saveState());
+	// settings.setValue("photocrop/windowState", saveState());
 
 	settings.setValue("photocrop/src", m_imagesList->getImagesDir());
 	settings.setValue("photocrop/dst", m_saveDir);
+	settings.setValue("photocrop/lang", m_language);
 
 	QMainWindow::closeEvent(event);
 }

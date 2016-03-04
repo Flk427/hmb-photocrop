@@ -61,6 +61,7 @@ private:
 	QLabel* m_fileInfo;
 
 	int m_imageIndex;
+	QString m_language;
 
 	void readSettings();
 	void setupUiConnections();
