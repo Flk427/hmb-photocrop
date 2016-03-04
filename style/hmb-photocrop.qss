@@ -1,0 +1,7 @@
+﻿MainWindow {
+	background-color: #bbb;
+}
+
+#centralWidget {
+//	background-color: #6AF;
+}
