@@ -57,6 +57,12 @@ Versions
 4.03.2016
 ---------
 
+**Fixed:** "prev"/"next" buttons accessibility.
+
 **Add:** Autoresize preview.
 
 **Add:** Autostore/restore settings.
+
+**Add:** Disable toolbox for command line mode (*.exe -src=<infile> -dst=<outflie>)
+
+**Add:** Load language from settings (or *.exe -lang=ru)
