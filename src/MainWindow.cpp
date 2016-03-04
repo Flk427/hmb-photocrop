@@ -19,6 +19,8 @@ MainWindow::MainWindow(const SApplicationParams& params, QWidget *parent) :
 	ui->setupUi(this);
 	this->resize(800, 600);
 
+	m_imagesList = new ImagesList(this);
+
 	QTimer* setupUITimer = new QTimer(this);
 	setupUITimer->setSingleShot(true);
 	connect(setupUITimer, &QTimer::timeout, this, &MainWindow::onCreate);
@@ -27,6 +29,7 @@ MainWindow::MainWindow(const SApplicationParams& params, QWidget *parent) :
 
 MainWindow::~MainWindow()
 {
+	delete m_imagesList;
 	delete ui;
 }
 
@@ -44,35 +47,6 @@ void MainWindow::scaleUp()
 void MainWindow::scaleDown()
 {
 	ui->graphicsView->scale(0.9, 0.9);
-}
-
-/*!
-	\brief Change image by his index and load it to the image container.
-
-	After succesfull loading image container emits signals 'imageLoaded' and 'imageChanged'.
-
-	\param imageIndex
-*/
-void MainWindow::changeImage(int imageIndex)
-{
-	m_imageIndex = imageIndex;
-
-	if (m_imageIndex < 0)
-	{
-		updateFileInfo("", -1, 0);
-	}
-	else
-	{
-		updateFileInfo(m_files.at(m_imageIndex), m_imageIndex, m_files.size());
-	}
-
-	ui->actionPreviousFile->setEnabled(m_imageIndex > 0);
-	ui->actionNextFile->setEnabled(m_imageIndex >= 0 && m_imageIndex < m_files.size() - 1);
-
-	if (imageIndex >= 0 && imageIndex < m_files.size())
-	{
-		m_imageContainer.loadImage(m_files.at(imageIndex));
-	}
 }
 
 void MainWindow::updateFileInfo(const QString& name, int pos, int count)
@@ -210,8 +184,6 @@ void MainWindow::onCreate()
 {
 	setEditControlsEnable(false);
 
-	changeImage(-1);
-
 	setupLanguage();
 	setupToolBar();
 	setupGraphicScene();
@@ -234,7 +206,7 @@ void MainWindow::onCropAction()
 
 void MainWindow::onSavePressed()
 {
-	QString fileName = m_saveDir + QDir::separator() + QFileInfo(m_files.at(m_imageIndex)).fileName();
+	QString fileName = m_saveDir + QDir::separator() + QFileInfo(m_imagesList->getImageFileName()).fileName();
 	QFile file(fileName);
 
 	if (file.exists())
@@ -253,7 +225,7 @@ void MainWindow::onSavePressed()
 	}
 
 	m_imageContainer.saveImage(fileName);
-	onNextFilePressed();
+	m_imagesList->next();
 }
 
 void MainWindow::onDestDirPressed()
@@ -278,35 +250,6 @@ void MainWindow::onImageLoaded()
 void MainWindow::onImageLoadError()
 {
 	setEditControlsEnable(false);
-}
-
-void MainWindow::onOpenFilesPressed()
-{
-	m_files = QFileDialog::getOpenFileNames(
-				  this,
-				  tr("Select files..."),
-				  m_filesDir,
-				  "Portable network graphic (*.png);;JPEG (*.jpg)", 0, 0);
-
-	if (m_files.size() != 0)
-	{
-		m_filesDir = QFileInfo(m_files.at(0)).absolutePath();
-		changeImage(0);
-	}
-	else
-	{
-		// Используем старый список.
-	}
-}
-
-void MainWindow::onPrevFilePressed()
-{
-	changeImage(m_imageIndex - 1);
-}
-
-void MainWindow::onNextFilePressed()
-{
-	changeImage(m_imageIndex + 1);
 }
 
 void MainWindow::onSelectorAspectParamsChanged()
@@ -353,18 +296,25 @@ void MainWindow::onCropSelectorMoved()
 	m_acpectInfo->setText(tr("Aspect ratio:") + QString(" %1").arg(m_cropSelector->width() / m_cropSelector->height()));
 }
 
+void MainWindow::changeImage(QString fileName, bool isFirst, bool isLast)
+{
+	m_imageContainer.loadImage(fileName);
+	ui->actionPreviousFile->setEnabled(!isFirst);
+	ui->actionNextFile->setEnabled(!isLast);
+}
+
 void MainWindow::setupUiConnections()
 {
 	connect(ui->actionFit, &QAction::triggered, this, &MainWindow::fit);
 	connect(ui->actionScaleP10, &QAction::triggered, this, &MainWindow::scaleUp);
 	connect(ui->actionScaleM10, &QAction::triggered, this, &MainWindow::scaleDown);
-	connect(ui->actionPreviousFile, &QAction::triggered, this, &MainWindow::onPrevFilePressed);
-	connect(ui->actionNextFile, &QAction::triggered, this, &MainWindow::onNextFilePressed);
+	connect(ui->actionPreviousFile, &QAction::triggered, m_imagesList, &ImagesList::previous);
+	connect(ui->actionNextFile, &QAction::triggered, m_imagesList, &ImagesList::next);
 
 	connect(ui->actionCropImage, &QAction::triggered, this, &MainWindow::onCropAction);
 	connect(ui->actionSaveFile, &QAction::triggered, this, &MainWindow::onSavePressed);
 	connect(ui->actionDestDir, &QAction::triggered, this, &MainWindow::onDestDirPressed);
-	connect(ui->actionOpenFiles, &QAction::triggered, this, &MainWindow::onOpenFilesPressed);
+	connect(ui->actionOpenFiles, &QAction::triggered, m_imagesList, &ImagesList::openImages);
 	connect(ui->actionRestoreImage, &QAction::triggered, &m_imageContainer, &ImageContainer::restoreImage);
 	connect(ui->actionRotL, &QAction::triggered, &m_imageContainer, &ImageContainer::rotateLeft);
 	connect(ui->actionRotR, &QAction::triggered, &m_imageContainer, &ImageContainer::rotateRight);
@@ -379,4 +329,6 @@ void MainWindow::setupUiConnections()
 
 	connect(m_aspectSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectorAspectParamsChanged()));
 	connect(m_ribbonOrientationSelector, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectorAspectParamsChanged()));
+
+	connect(m_imagesList, &ImagesList::selected, this, &MainWindow::changeImage);
 }

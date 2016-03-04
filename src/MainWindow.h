@@ -12,6 +12,7 @@
 #include "ImageContainer.h"
 #include "GraphicsRibbonItem.h"
 #include "ApplicationParams.h"
+#include "ImagesList.h"
 
 namespace Ui {
 class MainWindow;
@@ -37,11 +38,9 @@ public slots:
 	void onDestDirPressed();
 	void onImageLoaded();
 	void onImageLoadError();
-	void onOpenFilesPressed();
-	void onPrevFilePressed();
-	void onNextFilePressed();
 	void onSelectorAspectParamsChanged();
 	void onCropSelectorMoved();
+	void changeImage(QString fileName, bool isFirst, bool isLast);
 
 private:
 	SApplicationParams m_params;
@@ -50,6 +49,7 @@ private:
 	GraphicsRibbonItem* m_cropSelector;
 	QGraphicsScene m_graphicsScene;
 	AspectInfo m_acpectsContainer;
+	ImagesList* m_imagesList;
 
 	QGraphicsPixmapItem* m_sceneImageItem;
 	QComboBox* m_aspectSelector;
@@ -62,7 +62,6 @@ private:
 
 	QString m_filesDir;
 	int m_imageIndex;
-	QStringList m_files;
 
 	void setupUiConnections();
 	void setupLanguage();
@@ -72,9 +71,6 @@ private:
 	void setupStatusBar();
 	void setEditControlsEnable(bool enabled);
 	void applyParams();
-
-	//! Change image
-	void changeImage(int imageIndex);
 	void updateFileInfo(const QString& name, int pos, int count);
 	void createAspectSelector();
 };

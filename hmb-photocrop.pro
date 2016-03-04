@@ -37,7 +37,8 @@ SOURCES += src/main.cpp\
 	src/CropGraphicsView.cpp \
 	src/ApplicationParams.cpp \
 	src/AspectInfo.cpp \
-    src/ImagePreview.cpp
+    src/ImagePreview.cpp \
+    src/ImagesList.cpp
 
 HEADERS  += src/MainWindow.h \
 	src/ImageContainer.h \
@@ -45,7 +46,8 @@ HEADERS  += src/MainWindow.h \
 	src/CropGraphicsView.h \
 	src/ApplicationParams.h \
 	src/AspectInfo.h \
-    src/ImagePreview.h
+    src/ImagePreview.h \
+    src/ImagesList.h
 
 FORMS    += src/MainWindow.ui
 
