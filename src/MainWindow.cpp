@@ -63,14 +63,22 @@ void MainWindow::updateFileInfo(const QString& name, int pos, int count)
 
 void MainWindow::createAspectSelector()
 {
-	m_aspectSelector = new QComboBox();
+    m_aspectSelector = new QComboBox(this);
 	m_aspectSelector->addItem(tr("none"), -1);
 
 	for (int i = 0; i < m_acpectsContainer.size(); ++i)
 	{
 		AspectInfo::SASPECT aspect = m_acpectsContainer.getAspect(i);
 		m_aspectSelector->addItem(QString("%1:%2").arg(aspect.w).arg(aspect.h), i);
-	}
+    }
+}
+
+void MainWindow::createFormatSelector()
+{
+    m_formatSelector = new QComboBox(this);
+    m_formatSelector->addItem(tr("*"), -1);
+    m_formatSelector->addItem("PNG", -1);
+    m_formatSelector->addItem("JPG", -1);
 }
 
 void MainWindow::setupLanguage()
@@ -103,6 +111,12 @@ void MainWindow::setupToolBar()
 	m_ribbonOrientationSelector->addItem(tr("Landscape"));
 	m_ribbonOrientationSelector->setEnabled(false);
 	ui->toolBar->addWidget(m_ribbonOrientationSelector);
+
+    QLabel* formatSelectorLabel = new QLabel(tr("Save as:"));
+    formatSelectorLabel->setContentsMargins(5, 0, 5, 0);
+    ui->toolBar->addWidget(formatSelectorLabel);
+    createFormatSelector();
+    ui->toolBar->addWidget(m_formatSelector);
 }
 
 void MainWindow::setupGraphicScene()

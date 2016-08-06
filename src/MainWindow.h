@@ -53,6 +53,7 @@ private:
 
 	QGraphicsPixmapItem* m_sceneImageItem;
 	QComboBox* m_aspectSelector;
+    QComboBox* m_formatSelector;
 	QComboBox* m_ribbonOrientationSelector;
 
 	QString m_saveDir;
@@ -74,6 +75,7 @@ private:
 	void applyParams();
 	void updateFileInfo(const QString& name, int pos, int count);
 	void createAspectSelector();
+    void createFormatSelector();
 
 	// QWidget interface
 protected:
